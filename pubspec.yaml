@@ -1,6 +1,6 @@
 name: aurora_decoration
 description: Lets you create aurora gradient background.
-version: 0.0.1
+version: 0.0.3
 repository: https://github.com/KevinVan720/aurora_decoration.git
 
 environment:

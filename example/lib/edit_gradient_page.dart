@@ -4,6 +4,8 @@ import 'package:aurora_decoration/aurora_decoration.dart';
 
 import 'dart:math';
 
+import 'dart:ui';
+
 class EditGradientPage extends StatefulWidget {
   const EditGradientPage({Key? key, required this.title}) : super(key: key);
 
@@ -31,26 +33,35 @@ class _EditGradientPageState extends State<EditGradientPage> {
     List<Gradient>? gradients = [];
     List<double>? blurs = [];
 
-    for (int i = 0; i < 3; i++) {
-      Color joint = Color.fromARGB(rng.nextInt(100), rng.nextInt(255),
-          rng.nextInt(255), rng.nextInt(255));
+    for (int i = 0; i < 1; i++) {
+      Color joint = Color.fromARGB(
+          255, rng.nextInt(255), rng.nextInt(255), rng.nextInt(255));
       gradients.add(SweepGradient(
+          //transform: GradientSkew((rng.nextDouble() - 0.5) * 2 * pi,
+          //    (rng.nextDouble() - 0.5) * 2 * pi),
           center: Alignment(
               (rng.nextDouble() - 0.5) * 2, (rng.nextDouble() - 0.5) * 2),
           colors: [
             joint,
-            Colors.transparent,
-            Color.fromARGB(rng.nextInt(100), rng.nextInt(255), rng.nextInt(255),
-                rng.nextInt(255)),
+            Color.fromARGB(
+                255, rng.nextInt(255), rng.nextInt(255), rng.nextInt(255)),
+            Color.fromARGB(
+                255, rng.nextInt(255), rng.nextInt(255), rng.nextInt(255)),
+            Color.fromARGB(
+                255, rng.nextInt(255), rng.nextInt(255), rng.nextInt(255)),
+            Color.fromARGB(
+                255, rng.nextInt(255), rng.nextInt(255), rng.nextInt(255)),
             joint
           ],
           stops: [
             0,
-            rng.nextDouble() * 0.4 + 0.2,
-            rng.nextDouble() * 0.4 + 0.6,
+            rng.nextDouble() * 0.2 + 0.2,
+            rng.nextDouble() * 0.2 + 0.4,
+            rng.nextDouble() * 0.2 + 0.6,
+            rng.nextDouble() * 0.2 + 0.8,
             1,
           ]));
-      blurs.add(rng.nextDouble() * 10 + 10);
+      blurs.add(rng.nextDouble() * 10 + 0);
     }
 
     for (int i = 0; i < 5; i++) {
@@ -85,6 +96,7 @@ class _EditGradientPageState extends State<EditGradientPage> {
               borderRadius: DynamicBorderRadius.all(
                   DynamicRadius.circular(30.toPXLength))),
           decoration: AuroraDecoration(
+              backgroundBlendMode: BlendMode.srcOver,
               color: Color(0xFFd199ff),
               gradientBlurs: blurs,
               gradients: gradients),
@@ -107,4 +119,34 @@ class _EditGradientPageState extends State<EditGradientPage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+class GradientSkew extends GradientTransform {
+  /// Constructs a [GradientRotation] for the specified angle.
+  ///
+  /// The angle is in radians in the clockwise direction.
+  const GradientSkew(this.skewX, this.skewY);
+
+  /// The angle of rotation in radians in the clockwise direction.
+  final double skewX;
+  final double skewY;
+
+  @override
+  Matrix4 transform(Rect bounds, {TextDirection? textDirection}) {
+    assert(bounds != null);
+
+    return Matrix4.skew(skewX, skewY);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    return other is GradientSkew &&
+        other.skewX == skewX &&
+        other.skewY == skewY;
+  }
+
+  @override
+  int get hashCode => skewX.hashCode;
 }

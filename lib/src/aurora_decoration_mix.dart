@@ -33,8 +33,7 @@ class AuroraDecorationMix extends Decoration {
     this.gradientBlurs,
     this.backgroundBlendMode,
     this.shape = BoxShape.rectangle,
-  })  : assert(shape != null),
-        assert(
+  })  : assert(
           backgroundBlendMode == null || color != null || gradients != null,
           "backgroundBlendMode applies to BoxDecoration's background color or "
           'gradient, but no color or gradient was provided.',
@@ -165,9 +164,10 @@ class AuroraDecorationMix extends Decoration {
         final Rect square = Rect.fromCircle(center: center, radius: radius);
         return Path()..addOval(square);
       case BoxShape.rectangle:
-        if (borderRadius != null)
+        if (borderRadius != null) {
           return Path()
             ..addRRect(borderRadius!.resolve(textDirection).toRRect(rect));
+        }
         return Path()..addRect(rect);
     }
   }
@@ -206,7 +206,6 @@ class AuroraDecorationMix extends Decoration {
 
   @override
   bool hitTest(Size size, Offset position, {TextDirection? textDirection}) {
-    assert(shape != null);
     assert((Offset.zero & size).contains(position));
     switch (shape) {
       case BoxShape.rectangle:
@@ -234,19 +233,17 @@ class AuroraDecorationMix extends Decoration {
 /// An object that paints a [AuroraDecorationMix] into a canvas.
 class _BoxDecorationMixPainter extends BoxPainter {
   _BoxDecorationMixPainter(this._decoration, VoidCallback? onChanged)
-      : assert(_decoration != null),
-        super(onChanged);
+      : super(onChanged);
 
   final AuroraDecorationMix _decoration;
 
   Paint? _cachedColorPaint;
   Paint _getColorPaint(Rect rect, TextDirection? textDirection) {
-    assert(rect != null);
-
     if (_cachedColorPaint == null) {
       final Paint paint = Paint();
-      if (_decoration.backgroundBlendMode != null)
+      if (_decoration.backgroundBlendMode != null) {
         paint.blendMode = _decoration.backgroundBlendMode!;
+      }
       if (_decoration.color != null) paint.color = _decoration.color!;
       _cachedColorPaint = paint;
     }
@@ -258,31 +255,26 @@ class _BoxDecorationMixPainter extends BoxPainter {
   List<Rect?> _rectForCachedGradientPaints = [];
 
   Paint _getGradientPainAt(Rect rect, TextDirection? textDirection, int i) {
-    assert(rect != null);
-
-    assert(_decoration.gradients![i] != null ||
-        _rectForCachedGradientPaints[i] == null);
+    assert(_rectForCachedGradientPaints[i] == null);
 
     if (_cachedGradientPaints[i] == null ||
-        (_decoration.gradients![i] != null &&
-            _rectForCachedGradientPaints[i] != rect)) {
+        (_rectForCachedGradientPaints[i] != rect)) {
       final Paint paint = Paint();
-      if (_decoration.backgroundBlendMode != null)
+      if (_decoration.backgroundBlendMode != null) {
         paint.blendMode = _decoration.backgroundBlendMode!;
-      if (_decoration.gradients![i] != null) {
-        if (_decoration.gradientBlurs != null &&
-            i < _decoration.gradientBlurs!.length) {
-          if (_decoration.gradientBlurs![i] > 0) {
-            paint.imageFilter = ImageFilter.blur(
-                sigmaY: _decoration.gradientBlurs![i],
-                sigmaX: _decoration.gradientBlurs![i]);
-          }
-        }
-
-        paint.shader = _decoration.gradients![i]!
-            .createShader(rect, textDirection: textDirection);
-        _rectForCachedGradientPaints[i] = rect;
       }
+      if (_decoration.gradientBlurs != null &&
+          i < _decoration.gradientBlurs!.length) {
+        if (_decoration.gradientBlurs![i] > 0) {
+          paint.imageFilter = ImageFilter.blur(
+              sigmaY: _decoration.gradientBlurs![i],
+              sigmaX: _decoration.gradientBlurs![i]);
+        }
+      }
+
+      paint.shader = _decoration.gradients![i]
+          .createShader(rect, textDirection: textDirection);
+      _rectForCachedGradientPaints[i] = rect;
       _cachedGradientPaints[i] = paint;
     }
 
@@ -304,11 +296,12 @@ class _BoxDecorationMixPainter extends BoxPainter {
         clipPath = Path()..addOval(square);
         break;
       case BoxShape.rectangle:
-        if (_decoration.borderRadius != null)
+        if (_decoration.borderRadius != null) {
           clipPath = Path()
             ..addRRect(_decoration.borderRadius!
                 .resolve(configuration.textDirection)
                 .toRRect(rect));
+        }
         break;
     }
     _imagePainter!.paint(canvas, rect, clipPath, configuration);
@@ -347,9 +340,10 @@ class _BoxDecorationMixPainter extends BoxPainter {
 
   void _paintBackgroundColor(
       Canvas canvas, Rect rect, TextDirection? textDirection) {
-    if (_decoration.color != null)
+    if (_decoration.color != null) {
       _paintBox(
           canvas, rect, _getColorPaint(rect, textDirection), textDirection);
+    }
     if (_decoration.gradients != null) {
       _cachedGradientPaints =
           List.generate(_decoration.gradients!.length, (index) => null);
@@ -371,7 +365,6 @@ class _BoxDecorationMixPainter extends BoxPainter {
   /// Paint the box decoration into the given location on the given canvas.
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
-    assert(configuration != null);
     assert(configuration.size != null);
     final Rect rect = offset & configuration.size!;
     final TextDirection? textDirection = configuration.textDirection;
